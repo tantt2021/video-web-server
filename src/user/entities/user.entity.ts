@@ -15,7 +15,7 @@ export class User {
     createTime: Date
 
     @Column({ type: "varchar", length: 255 })
-    decription: string
+    description: string
 
     @Column({ type: "varchar", length: 255 })
     sex: string
