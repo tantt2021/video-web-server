@@ -1,0 +1,9 @@
+{
+    "editor.cursorStyle": "line",
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "window.autoDetectColorScheme": false,
+    "explorer.fileNesting.enabled": false,
+    "search.experimental.notebookSearch": false,
+    "debug.console.lineHeight": 0
+}

@@ -8,7 +8,7 @@ import { AllExceptionFilter } from './core/filter/all-exception.filter/all-excep
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // 配置虚拟目录
-  app.useStaticAssets(join(__dirname, 'images'))
+  app.useStaticAssets('public');
   app.useGlobalInterceptors(new TransformInterceptor());//请求成功拦截
   app.useGlobalFilters(new AllExceptionFilter());
   app.enableCors();   //跨域

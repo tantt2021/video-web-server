@@ -12,22 +12,42 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailController } from "./email/email.controller";
 import { EmailService } from './email/email.service';
+import { FollowingModule } from './following/following.module';
+import { FansModule } from './fans/fans.module';
+import { HistoryModule } from './history/history.module';
+
+// 视频保存成静态资源
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join,extname } from 'path';
+import { MulterModule } from '@nestjs/platform-express';
+
+import {diskStorage} from 'multer'
+import { StarService } from './star/star.service';
+import { StarModule } from './star/star.module';
+import { MessageController } from './message/message.controller';
+import { MessageModule } from './message/message.module';
+import { CommentService } from './comment/comment.service';
+import { CommentModule } from './comment/comment.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '1.12.240.146',
       port: 3306,
-      username: 'root',
-      password: 'tantt',
-      database: 'nestvideo',
+      username: 'tantt',
+      password: '!Tan402010',
+      database: 'videoWeb',
       entities: [],
       synchronize: true,
       autoLoadEntities: true,
     }),
     VideoModule,
     UserModule,
+    FansModule,
+    FollowingModule,
+    HistoryModule,
     MailerModule.forRoot({
       transport: {
         host: 'smtp.qq.com',
@@ -52,7 +72,13 @@ import { EmailService } from './email/email.service';
         },
       },
     }),
-
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'public'),
+    }),
+    StarModule,
+    MessageModule,
+    CommentModule,
+    LikeModule,
   ],
   controllers: [AppController,EmailController],
   providers: [AppService,EmailService],

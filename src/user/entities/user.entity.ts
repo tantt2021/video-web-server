@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeor
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    id: number
+    id: string
 
     @Column({ type: "varchar", length: 255 })
     uname: string
@@ -24,10 +24,18 @@ export class User {
     likeCount: number
 
     @Column({ type: "int" })
+    fansCount: number
+
+    @Column({ type: "int" })
     views: number
 
-    @Column({ type: "varchar" })
-    birth: string
 
+    @Column({ type: "varchar",length:100 })
+    email: string
 
+    @Column({ type: "varchar",length:100 })
+    avatar: string
+
+    @Column({type:"tinyint"})
+    pause_history: boolean
 }

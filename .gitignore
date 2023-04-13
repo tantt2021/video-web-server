@@ -1,6 +1,9 @@
 # compiled output
 /dist
 /node_modules
+/public/..
+
+!/public/**/*.+(jpg|jpeg|gif|png|svg|webp|mp4|avi|mov|wmv|flv|mkv)
 
 # Logs
 logs
