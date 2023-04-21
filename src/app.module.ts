@@ -21,7 +21,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join,extname } from 'path';
 import { MulterModule } from '@nestjs/platform-express';
 
-import {diskStorage} from 'multer'
+// import {diskStorage} from 'multer'
 import { StarService } from './star/star.service';
 import { StarModule } from './star/star.module';
 import { MessageController } from './message/message.controller';
@@ -29,6 +29,11 @@ import { MessageModule } from './message/message.module';
 import { CommentService } from './comment/comment.service';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
+import { ChatController } from './chat/chat.controller';
+import { ChatModule } from './chat/chat.module';
+import { MarqueeService } from './marquee/marquee.service';
+import { MarqueeModule } from './marquee/marquee.module';
+import { DynamicModule } from './dynamic/dynamic.module';
 
 @Module({
   imports: [
@@ -39,6 +44,10 @@ import { LikeModule } from './like/like.module';
       username: 'tantt',
       password: '!Tan402010',
       database: 'videoWeb',
+      charset: 'utf8mb4',
+      extra: {
+        collation: 'utf8mb4_unicode_ci',
+      },
       entities: [],
       synchronize: true,
       autoLoadEntities: true,
@@ -79,6 +88,9 @@ import { LikeModule } from './like/like.module';
     MessageModule,
     CommentModule,
     LikeModule,
+    ChatModule,
+    MarqueeModule,
+    DynamicModule,
   ],
   controllers: [AppController,EmailController],
   providers: [AppService,EmailService],

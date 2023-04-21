@@ -154,6 +154,11 @@ export class VideoController {
     }
   }
 
+  // 获取排行榜
+  @Get("getTop")
+  async getTop(@Query() query){
+    return this.videoService.calculateScore();
+  }
 
   @Post("getOneVideo")
   async getOneVideo(@Query() query){

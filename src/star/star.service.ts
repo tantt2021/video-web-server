@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Star } from './entities/star.entity';
 import { Video } from 'src/video/entities/video.entity';
+import { Message } from 'src/message/entities/message.entity';
 const mysql = require('mysql2/promise');
 
 interface StarType{
@@ -17,7 +18,9 @@ export class StarService {
         @InjectRepository(Star) 
         private star:Repository<Star>,
         @InjectRepository(Video)
-        private video:Repository<Video>
+        private video:Repository<Video>,
+        @InjectRepository(Message)
+        private message:Repository<Message>
     ){}
 
     // 添加收藏记录
@@ -30,7 +33,24 @@ export class StarService {
         const video = await this.video.findOne({where:{id:query.videoId}});
         video.starCount += 1;
         await this.video.save(video);
-        return {msg:"已添加到收藏夹并更新了视频收藏量"};
+
+        // 添加收藏消息
+        let newStarMess = new Message();
+        // 查询视频作者
+        let {authorId} = await this.video.findOne({
+            where:{
+                id:query.videoId
+            }
+        })
+        newStarMess.is_read = false;
+        newStarMess.message_text = "收藏";
+        newStarMess.operate = "收藏";
+        newStarMess.type = "other";
+        newStarMess.receiver_id = authorId;
+        newStarMess.sender_id = query.userId;
+        newStarMess.target_id = query.videoId;
+        this.message.save(newStarMess);
+        return {msg:"已添加到收藏夹并更新了视频收藏量&添加收藏消息"};
     }
 
     // 查询收藏夹

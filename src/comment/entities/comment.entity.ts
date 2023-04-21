@@ -28,4 +28,7 @@ export class Comment{
 
     @Column({type:"varchar",length:255})
     type:string
+
+    @Column({type:"varchar",length:100})
+    reply_user_id:string
 }

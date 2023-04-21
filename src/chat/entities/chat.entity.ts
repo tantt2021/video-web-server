@@ -1,12 +1,9 @@
 import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 
 @Entity()
-export class Message{
+export class Chat{
     @PrimaryGeneratedColumn("uuid")
     id:string
-
-    @Column({type:"varchar",length:255})
-    type:string
 
     @Column({type:"varchar",length:255})
     sender_id:string
@@ -22,10 +19,4 @@ export class Message{
 
     @Column({type:"boolean"})
     is_read:boolean
-
-    @Column({type:"varchar", length:100})
-    operate:string
-
-    @Column({type:"varchar", length:100})
-    target_id: string
 }

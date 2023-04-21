@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Like } from './entities/like.entity';
 import { Video } from 'src/video/entities/video.entity';
-
+import { Message } from 'src/message/entities/message.entity';
 interface LikeType{
     userId:string,
     videoId:string,
@@ -16,7 +16,9 @@ export class LikeService {
         @InjectRepository(Like)
         private like:Repository<Like>,
         @InjectRepository(Video)
-        private video:Repository<Video>
+        private video:Repository<Video>,
+        @InjectRepository(Message)
+        private message:Repository<Message>,
     ){}
     
     // 处理点赞和取消赞
@@ -35,6 +37,24 @@ export class LikeService {
             const newLikeRecord = this.like.create({userId,videoId});
             await this.like.save(newLikeRecord);
             await this.video.increment({id:videoId},'likeCount',1);
+
+            // 发送消息
+            let newStarMess = new Message();
+            // 查询视频作者
+            let {authorId} = await this.video.findOne({
+                where:{
+                    id:videoId
+                }
+            })
+            newStarMess.is_read = false;
+            newStarMess.message_text = "点赞";
+            newStarMess.operate = "点赞";
+            newStarMess.type = "other";
+            newStarMess.receiver_id = authorId;
+            newStarMess.sender_id = userId;
+            newStarMess.target_id = videoId;
+            this.message.save(newStarMess);
+
             return {msg:"已点赞成功并更新了视频的点赞数"};
 
         }
