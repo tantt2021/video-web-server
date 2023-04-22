@@ -14,7 +14,7 @@ export class LikeController {
     // 查询是否已经点赞
     @Post("isLike")
     isLike(@Query() query){
-        console.log("查询用户是否有该视频的点赞记录",query);
+        console.log("查询用户的点赞记录",query);
         return this.likeService.isLike(query);
     }
 }

@@ -163,10 +163,8 @@ export class VideoController {
   @Post("getOneVideo")
   async getOneVideo(@Query() query){
     console.log("用户请求返回某一个视频",query);
-    let videoInfo = await this.videoService.getOneVideo(query);
-    console.log(videoInfo,"videoinfo");
-    let isFollow = await this.FollowingService.isFollowing({userId:query.userId,followId:videoInfo.authorId});
-    return {videoInfo,isFollow};
+    // 视频信息，是否点赞收藏，发布者信息，videoId,id
+    return this.videoService.getOneVideo(query);
   }
 
   // 获取全部video
@@ -188,4 +186,8 @@ export class VideoController {
     
     return this.videoService.addViews(query);
   }
+
+  
 }
+
+

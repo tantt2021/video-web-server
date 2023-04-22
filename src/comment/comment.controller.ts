@@ -16,7 +16,7 @@ export class CommentController {
     // 查找评论
     @Post("getComment")
     findComments(@Query() query){
-        console.log("查找评论,视频id",query);
+        console.log("查找评论,id",query);
         
         return this.commentService.findComments(query);
     }

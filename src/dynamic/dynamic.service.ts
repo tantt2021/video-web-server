@@ -4,6 +4,7 @@ import { Following } from 'src/following/entities/following.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 const mysql = require('mysql2/promise');
+import * as fs from 'fs';
 
 
 @Injectable()
@@ -66,4 +67,28 @@ export class DynamicService {
         return this.dynamic.save(newOne);
     }
 
+    // 删除动态
+    delDynamic(@Query() query){
+        // 图片也要删除
+        let {id, img} = query;
+        let imgTempArr = img.split("&&");
+        imgTempArr?.splice(imgTempArr.length - 1 ,1);
+        console.log('删除的图片：',imgTempArr);
+
+        const imageDir = 'public/images';
+        imgTempArr.forEach(img => {
+            img = img.substring(29);
+            console.log(img);
+            
+            const imagePath = `${imageDir}/${img}`;
+            try {
+              fs.unlinkSync(imagePath);
+            } catch (err) {
+              console.error(`Failed to delete image file "${imagePath}": ${err.message}`);
+            }
+        });
+        return this.dynamic.delete({
+            id
+        })
+    }
 }

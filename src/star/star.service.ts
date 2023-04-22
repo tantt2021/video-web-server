@@ -83,6 +83,18 @@ export class StarService {
         const video = await this.video.findOne({where:{id:videoId}});
         video.starCount -= 1;
         await this.video.save(video);
+        // 删除收藏信息
+        let message = await this.message.findOne({
+            where:{
+                type:'other',
+                sender_id:userId,
+                receiver_id:video.authorId,
+                message_text:"收藏",
+                operate:"收藏",
+                target_id:videoId,
+            }
+        })
+        this.message.remove(message);
         return {msg:"已取消收藏并更新了视频收藏量"};
     }
 

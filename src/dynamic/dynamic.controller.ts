@@ -3,6 +3,7 @@ import { DynamicService } from './dynamic.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
 import { createWriteStream } from 'fs';
+import { query } from 'express';
 
 @Controller('dynamic')
 export class DynamicController {
@@ -27,10 +28,13 @@ export class DynamicController {
         console.log("动态的图片文件",files);
         body.imgArr = "";  // 后端处理imgArr字段
         const promises = [];
+        const arrTemp = [];
         if(Object.keys(files).length >0){
             for(let i = 0; i < files["img"].length; i++){
                 const promise = new Promise((resolve,reject)=>{
-                    let imgName = `${new Date().getTime()}.${files["img"][i].originalname.split(".")[1]}`;
+                    // let imgName = `${new Date().getTime()}.${files["img"][i].originalname.split(".")[1]}`;
+                    let imgName = `${new Date().getTime()}${i}.${files["img"][i].originalname.split(".")[1]}`;
+                    arrTemp.push(imgName);
                     const imgPath = join(__dirname,'../..','public','images',imgName);
                     let stream = createWriteStream(imgPath);
                     stream.on('finish',resolve);
@@ -43,7 +47,18 @@ export class DynamicController {
             }
                 console.log(promises,"pro");
         }
-        await Promise.all(promises);
+        if(promises.length>0)
+            await Promise.all(promises);
+        console.log("1111");
+        
         return this.dynamicService.addDynamic(body);
+    }
+
+    // 删除动态
+    @Post("delDynamic")
+    delDynamic(@Query() query){
+        console.log("用户删除动态，",query);
+        
+        return this.dynamicService.delDynamic(query);
     }
 }

@@ -2,15 +2,19 @@ import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
+import { Video } from 'src/video/entities/video.entity';
+import { Dynamic } from 'src/dynamic/entities/dynamic.entity';
 const mysql = require('mysql2/promise');
 
 @Injectable()
 export class CommentService {
     constructor(
-        @InjectRepository(Comment) private readonly comment:Repository<Comment>
+        @InjectRepository(Comment) private readonly comment:Repository<Comment>,
+        @InjectRepository(Video) private readonly video:Repository<Video>,
+        @InjectRepository(Dynamic) private readonly dynamic:Repository<Dynamic>
     ){}
 
-    addComment(@Query() query){
+    async addComment(@Query() query){
         let data = new Comment();
         data.content = query.content;
         data.user_id = query.user_id;
@@ -22,6 +26,15 @@ export class CommentService {
         data.downvotes = 0;
 
         // 给被评论的用户添加评论提醒消息messge
+
+        // 更新评论数
+        if(data.type === 'dynamic'){
+            const dynamic = await this.dynamic.findOne({where:{id:query.dynamic_id}});
+            dynamic.commentCount += 1;
+            this.dynamic.save(dynamic);
+        }else{
+
+        }
 
         return this.comment.save(data);
     }
@@ -40,7 +53,8 @@ export class CommentService {
             `SELECT c.*,u.uname,u.avatar
             from comment c 
             left join user u on c.user_id = u.id 
-            where c.dynamic_id = '${dynamic_id}';`
+            where c.dynamic_id = '${dynamic_id}'
+            order by c.createTime ASC;`
 
         )
         return rows;

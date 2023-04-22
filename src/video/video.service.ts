@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { Repository,DataSource } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Video } from './entities/video.entity';
@@ -8,6 +8,8 @@ import { Star } from 'src/star/entities/star.entity';
 import { History } from 'src/history/entities/history.entity';
 import { Marquee } from 'src/marquee/entities/marquee.entity';
 import { Like } from 'src/like/entities/like.entity';
+const mysql = require("mysql2/promise");
+import createConnection from '../database/db';
 interface VideoType{
     id:string,
     author?:string,
@@ -38,7 +40,7 @@ export class VideoService {
         private readonly marquee: Repository<Marquee>,
         @InjectRepository(Like) 
         private readonly like: Repository<Like>,
-        private dataSource:DataSource
+        private dataSource:DataSource,
     ) { }
 
     addVideo(query:VideoType) {
@@ -80,14 +82,35 @@ export class VideoService {
     }
 
     // 获取视频详情页
-    async getOneVideo(query:VideoType){
-        let {id} = query;
-        return await this.video.findOne({
-            where:{
-                id
-            }
-        });
+    // 获取是否点赞，是否收藏
+    async getOneVideo(@Query() query){
+
+        let {userId,videoId} = query;
+        // 视频信息，是否点赞收藏，发布者信息，videoId,id
+        let video = await this.video.findOne({where:{id:videoId}});
+        const connection = await createConnection();
+        const [row] =  await connection.execute(`
+            select u.id,u.avatar,u.uname,
+            COUNT(DISTINCT l.id) > 0 AS is_liked, 
+            COUNT(DISTINCT s.id) > 0 AS is_favorited,
+            COUNT(DISTINCT f.id) > 0 AS is_followed 
+            from video v
+            left join user u on v.authorId = u.id
+            LEFT JOIN \`like\` l ON l.userId = '${userId}' AND l.hostId = v.id 
+            LEFT JOIN star s ON s.userId = '${userId}' AND s.videoId = v.id 
+            LEFT JOIN following f ON f.userId = '${userId}' AND f.followId = v.authorId
+            where v.id = '${videoId}';
+        `);
+
+
+        let res = {
+            video,
+            author:row[0]
+
+        }
+        return res;
     }
+
 
     // 增加播放量
     async addViews(query:VideoType){
@@ -129,7 +152,7 @@ export class VideoService {
         let MarqueeCount = [];
         for(let i = 0; i < videoData.length;i++){
             let like = await this.like.find({
-                where:{videoId:videoData[i].id}
+                where:{hostId:videoData[i].id}
             });
             LikeCount.push(like.length);
 

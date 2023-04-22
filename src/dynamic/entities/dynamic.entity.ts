@@ -11,7 +11,7 @@ export class Dynamic{
     @CreateDateColumn({ type: "timestamp" })
     createTime: Date
 
-    @Column({type:"varchar",length:255})
+    @Column({type:"text"})
     content:string
 
     @Column({type:"varchar",length:255})
